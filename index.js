@@ -25,6 +25,22 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+    const visaCollection = client.db("visaDB").collection("visa");
+
+    app.get("/visa", async (req, res) => {
+      const cursor = visaCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.post("/visa", async (req, res) => {
+      const addVisa = req.body;
+      // console.log(addVisa);
+      const result = await visaCollection.insertOne(addVisa);
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
@@ -32,7 +48,7 @@ async function run() {
     );
   } finally {
     // Ensures that the client will close when you finish/error
-    await client.close();
+    // await client.close();
   }
 }
 run().catch(console.dir);
@@ -40,6 +56,7 @@ run().catch(console.dir);
 app.get("/", (req, res) => {
   res.send("visa navigator is running");
 });
+
 app.listen(port, () => {
   console.log(`visa navigator is running on port: ${port}`);
 });
