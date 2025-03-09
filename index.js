@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const { ObjectId } = require("mongodb");
 const { MongoClient, ServerApiVersion } = require("mongodb");
 require("dotenv").config();
 const port = process.env.PORT || 5000;
@@ -55,11 +56,11 @@ async function run() {
     });
 
     // Submit a visa application
-    // app.post("/apply-visa", async (req, res) => {
-    //   const application = req.body;
-    //   const result = await applicationsCollection.insertOne(application);
-    //   res.send(result);
-    // });
+    app.post("/apply-visa", async (req, res) => {
+      const application = req.body;
+      const result = await applicationsCollection.insertOne(application);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
