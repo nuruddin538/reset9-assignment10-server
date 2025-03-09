@@ -27,19 +27,39 @@ async function run() {
     await client.connect();
 
     const visaCollection = client.db("visaDB").collection("visa");
+    const applicationsCollection = client
+      .db("visaDB")
+      .collection("applications");
 
+    // Get all visas
     app.get("/visa", async (req, res) => {
       const cursor = visaCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     });
 
+    // Get a single visa by ID
+    app.get("/visa/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await visaCollection.findOne(query);
+      res.send(result);
+    });
+
+    // Add a new visa
     app.post("/visa", async (req, res) => {
       const addVisa = req.body;
       // console.log(addVisa);
       const result = await visaCollection.insertOne(addVisa);
       res.send(result);
     });
+
+    // Submit a visa application
+    // app.post("/apply-visa", async (req, res) => {
+    //   const application = req.body;
+    //   const result = await applicationsCollection.insertOne(application);
+    //   res.send(result);
+    // });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
