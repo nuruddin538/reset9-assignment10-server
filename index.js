@@ -62,6 +62,16 @@ async function run() {
       res.send(result);
     });
 
+    // Fetch visas added by the logged-in user
+    app.get("/my-visas", async (req, res) => {
+      const email = req.query.email;
+      const query = { addedBy: email };
+
+      const cursor = visaCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
     // Get all visa applications for a user
     app.get("/my-applications", async (req, res) => {
       const email = req.query.email;
