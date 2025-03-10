@@ -55,13 +55,6 @@ async function run() {
       res.send(result);
     });
 
-    // Submit a visa application
-    app.post("/apply-visa", async (req, res) => {
-      const application = req.body;
-      const result = await applicationsCollection.insertOne(application);
-      res.send(result);
-    });
-
     // Fetch visas added by the logged-in user
     app.get("/my-visas", async (req, res) => {
       const email = req.query.email;
@@ -101,13 +94,41 @@ async function run() {
       res.send(result);
     });
 
+    // Submit a visa application
+    app.post("/apply-visa", async (req, res) => {
+      const application = req.body;
+      const result = await applicationsCollection.insertOne(application);
+      res.send(result);
+    });
+
     // Get all visa applications for a user
     app.get("/my-applications", async (req, res) => {
-      const email = req.query.email;
-      const query = { email: email };
-      const cursor = applicationsCollection.find(query);
-      const result = await cursor.toArray();
-      res.send(result);
+      try {
+        const applications = await applicationsCollection.find().toArray();
+        res.json(applications);
+      } catch (error) {
+        res.status(500).json({ message: "Error fetching applications", error });
+      }
+    });
+
+    // Delete a visa application
+    app.delete("/apply-visa/:id", async (req, res) => {
+      const id = req.params.id;
+      try {
+        const result = await applicationsCollection.deleteOne({
+          _id: new ObjectId(id),
+        });
+        if (result.deletedCount > 0) {
+          res.send({
+            success: true,
+            message: "Application canceled successfully!",
+          });
+        } else {
+          res.status(404).send({ message: "Application not found" });
+        }
+      } catch (error) {
+        res.status(500).json({ message: "Error cancelling application" });
+      }
     });
 
     // Send a ping to confirm a successful connection
